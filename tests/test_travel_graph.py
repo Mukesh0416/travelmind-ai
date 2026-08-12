@@ -13,13 +13,13 @@ result = travel_graph.invoke({
 })
 
 print("\n--- LOCATION ---")
-print(result["location"])
+print(result.get("location"))
 
 print("\n--- WEATHER ---")
-print(result["weather"])
+print(result.get("weather"))
 
 print("\n--- SEARCH RESULTS ---")
-print(result["search_results"])
+print(result.get("search_results"))
 
 print("\n--- BUDGET ---")
-print(result["budget"])
+print(result.get("budget"))

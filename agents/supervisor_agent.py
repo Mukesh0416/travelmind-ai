@@ -1,11 +1,11 @@
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langgraph.types import Command
 
 
 def create_supervisor():
-    model = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0,
+    model = ChatGroq(
+    model="llama-3.1-8b-instant",
+    temperature=0,
     )
 
     def supervisor(state):

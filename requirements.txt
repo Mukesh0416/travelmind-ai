@@ -9,3 +9,5 @@ python-dotenv
 httpx
 pytest
 requests
+tavily-python
+langchain-groq
