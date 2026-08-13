@@ -1,5 +1,10 @@
 from langchain_groq import ChatGroq
-from config import *
+
+from services.agent_utils import (
+    log_agent_complete,
+    log_agent_error,
+    log_agent_start,
+)
 
 model = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -8,10 +13,17 @@ model = ChatGroq(
 
 
 def packing_agent(state):
+    """
+    Create a packing checklist for the trip.
+
+    Returns a partial state update only. Never mutates the input state.
+    """
+
+    log_agent_start("Packing")
 
     destination = state["destination"]
 
-    weather = state["weather"]
+    weather = state.get("weather", {})
 
     days = state["days"]
 
@@ -44,10 +56,25 @@ Create a checklist containing:
 Return the result as a checklist.
 """
 
-    response = model.invoke(prompt)
+    try:
 
-    state["packing_list"] = response.content
+        response = model.invoke(prompt)
 
-    state["next_agent"] = "itinerary"
+        log_agent_complete("Packing")
 
-    return state
+        return {
+            "packing_list": response.content,
+            "completed_agents": {"packing": True},
+        }
+
+    except Exception as exc:
+
+        log_agent_error("Packing", exc)
+
+        return {
+            "packing_list": "No packing list available.",
+            "completed_agents": {"packing": True},
+            "errors": [
+                f"Packing agent failed: {exc}"
+            ],
+        }

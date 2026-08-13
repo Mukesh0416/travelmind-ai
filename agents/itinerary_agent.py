@@ -1,5 +1,10 @@
 from langchain_groq import ChatGroq
-from config import *
+
+from services.agent_utils import (
+    log_agent_complete,
+    log_agent_error,
+    log_agent_start,
+)
 
 model = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -8,6 +13,13 @@ model = ChatGroq(
 
 
 def itinerary_agent(state):
+    """
+    Create the final day-by-day itinerary.
+
+    Returns a partial state update only. Never mutates the input state.
+    """
+
+    log_agent_start("Itinerary")
 
     destination = state.get("destination", "")
 
@@ -108,10 +120,25 @@ Also include:
 Return the itinerary in a clear format.
 """
 
-    response = model.invoke(prompt)
+    try:
 
-    state["itinerary"] = response.content
+        response = model.invoke(prompt)
 
-    state["next_agent"] = "end"
-    
-    return state
+        log_agent_complete("Itinerary")
+
+        return {
+            "itinerary": response.content,
+            "completed_agents": {"itinerary": True},
+        }
+
+    except Exception as exc:
+
+        log_agent_error("Itinerary", exc)
+
+        return {
+            "itinerary": "Unable to generate itinerary.",
+            "completed_agents": {"itinerary": True},
+            "errors": [
+                f"Itinerary agent failed: {exc}"
+            ],
+        }

@@ -2,6 +2,7 @@ from langgraph.graph import StateGraph
 from langgraph.graph import START, END
 
 from graph.state import TravelState
+from typing import Optional, cast
 
 from agents.supervisor_agent import create_supervisor
 
@@ -22,105 +23,34 @@ def create_graph():
 
     supervisor = create_supervisor()
 
-    graph.add_node(
-        "supervisor",
-        supervisor
-    )
+    graph.add_node("supervisor", supervisor)
 
-    graph.add_node(
-        "location",
-        location_agent
-    )
+    graph.add_node("location", location_agent)
+    graph.add_node("weather", weather_agent)
+    graph.add_node("search", search_agent)
+    graph.add_node("budget", budget_agent)
+    graph.add_node("accommodation", accommodation_agent)
+    graph.add_node("restaurant", restaurant_agent)
+    graph.add_node("transportation", transportation_agent)
+    graph.add_node("packing", packing_agent)
+    graph.add_node("itinerary", itinerary_agent)
 
-    graph.add_node(
-        "weather",
-        weather_agent
-    )
+    # The supervisor is the single entry point.
+    graph.add_edge(START, "supervisor")
 
-    graph.add_node(
-        "search",
-        search_agent
-    )
+    # Every agent returns control to the supervisor, which decides
+    # the next agent(s) based on dependencies and completion state.
+    graph.add_edge("location", "supervisor")
+    graph.add_edge("weather", "supervisor")
+    graph.add_edge("search", "supervisor")
+    graph.add_edge("budget", "supervisor")
+    graph.add_edge("accommodation", "supervisor")
+    graph.add_edge("restaurant", "supervisor")
+    graph.add_edge("transportation", "supervisor")
+    graph.add_edge("packing", "supervisor")
 
-    graph.add_node(
-        "budget",
-        budget_agent
-    )
-
-    graph.add_node(
-        "accommodation",
-        accommodation_agent
-    )
-
-    graph.add_node(
-        "restaurant",
-        restaurant_agent
-    )
-
-    graph.add_node(
-        "transportation",
-        transportation_agent
-    )
-
-    graph.add_node(
-        "packing",
-        packing_agent
-    )
-
-    graph.add_node(
-        "itinerary",
-        itinerary_agent
-    )
-
-    graph.add_edge(
-        START,
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "location",
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "weather",
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "search",
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "budget",
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "accommodation",
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "restaurant",
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "transportation",
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "packing",
-        "supervisor"
-    )
-
-    graph.add_edge(
-        "itinerary",
-        END
-    )
+    # The itinerary agent is the final step.
+    graph.add_edge("itinerary", END)
 
     return graph.compile()
 
@@ -128,23 +58,43 @@ def create_graph():
 travel_graph = create_graph()
 
 
-def run_travel_graph(destination):
+def run_travel_graph(
+    destination: Optional[str] = None,
+    state: Optional[dict] = None,
+):
+    """
+    Run the travel planning graph.
 
-    state = {
+    Args:
+        destination: Destination name (used when `state` is not provided).
+        state: Full initial state dict. If provided, `destination` is ignored.
 
-        "destination": destination,
+    Returns:
+        The final state produced by the graph.
+    """
 
-        "days": 3,
+    if state is None:
 
-        "travelers": 2,
+        state = {
+            "destination": destination,
+            "days": 3,
+            "travelers": 2,
+            "budget_per_day": 3000,
+            "interests": [],
+            "travel_style": "balanced",
+        }
 
-        "budget_per_day": 3000,
+    # Ensure the completion tracker is always present.
+    state.setdefault("completed_agents", {
+        "location": False,
+        "weather": False,
+        "search": False,
+        "budget": False,
+        "accommodation": False,
+        "restaurant": False,
+        "transportation": False,
+        "packing": False,
+        "itinerary": False,
+    })
 
-        "interests": [],
-
-        "travel_style": "balanced",
-
-        "next_agent": "location"
-    }
-
-    return travel_graph.invoke(state)
+    return travel_graph.invoke(cast(TravelState, state))

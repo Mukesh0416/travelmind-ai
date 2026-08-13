@@ -1,48 +1,31 @@
-# from graph.travel_graph import create_graph
+import sys
 
-
-# travel_graph = create_graph()
-
-# result = travel_graph.invoke({
-#     "destination": "Manali",
-#     "days": 3,
-#     "travelers": 2,
-#     "budget_per_day": 3000,
-#     "interests": ["nature", "adventure"],
-#     "travel_style": "budget",
-# })
-
-# print("\n--- LOCATION ---")
-# print(result.get("location"))
-
-# print("\n--- WEATHER ---")
-# print(result.get("weather"))
-
-# print("\n--- SEARCH RESULTS ---")
-# print(result.get("search_results"))
-
-# print("\n--- BUDGET ---")
-# print(result.get("budget"))
-
-# print("\n--- ATTRACTIONS ---")
-# print(result.get("places"))
-
+# Ensure UTF-8 output on Windows consoles (handles ₹ and other Unicode).
+_reconfigure = getattr(sys.stdout, "reconfigure", None)
+if _reconfigure is not None:
+    _reconfigure(encoding="utf-8")
 
 from graph.travel_graph import run_travel_graph
 
 result = run_travel_graph("Manali")
 
 print("\n--- LOCATION ---")
-print(result["location"])
+print(result.get("location"))
 
 print("\n--- WEATHER ---")
-print(result["weather"])
+print(result.get("weather"))
 
 print("\n--- SEARCH RESULTS ---")
-print(result["search_results"])
+print(result.get("search_results"))
 
 print("\n--- BUDGET ---")
-print(result["budget"])
+print(result.get("budget"))
 
 print("\n--- ITINERARY ---")
-print(result["itinerary"])
+print(result.get("itinerary"))
+
+print("\n--- COMPLETED AGENTS ---")
+print(result.get("completed_agents"))
+
+print("\n--- ERRORS ---")
+print(result.get("errors"))

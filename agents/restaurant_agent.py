@@ -1,5 +1,10 @@
 from langchain_groq import ChatGroq
-from config import *
+
+from services.agent_utils import (
+    log_agent_complete,
+    log_agent_error,
+    log_agent_start,
+)
 
 model = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -8,10 +13,17 @@ model = ChatGroq(
 
 
 def restaurant_agent(state):
+    """
+    Recommend restaurants for the destination.
+
+    Returns a partial state update only. Never mutates the input state.
+    """
+
+    log_agent_start("Restaurant")
 
     destination = state["destination"]
 
-    budget = state["budget"]["total_budget"]
+    budget = state.get("budget", {}).get("total_budget", 0)
 
     travel_style = state.get(
         "travel_style",
@@ -34,10 +46,25 @@ For each restaurant, provide:
 Return a concise list.
 """
 
-    response = model.invoke(prompt)
+    try:
 
-    state["restaurants"] = response.content
+        response = model.invoke(prompt)
 
-    state["next_agent"] = "transportation"
+        log_agent_complete("Restaurant")
 
-    return state
+        return {
+            "restaurants": response.content,
+            "completed_agents": {"restaurant": True},
+        }
+
+    except Exception as exc:
+
+        log_agent_error("Restaurant", exc)
+
+        return {
+            "restaurants": "No restaurant recommendations available.",
+            "completed_agents": {"restaurant": True},
+            "errors": [
+                f"Restaurant agent failed: {exc}"
+            ],
+        }

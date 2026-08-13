@@ -1,5 +1,10 @@
 from langchain_groq import ChatGroq
-from config import *
+
+from services.agent_utils import (
+    log_agent_complete,
+    log_agent_error,
+    log_agent_start,
+)
 
 model = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -8,12 +13,19 @@ model = ChatGroq(
 
 
 def transportation_agent(state):
+    """
+    Recommend transportation options for the trip.
+
+    Returns a partial state update only. Never mutates the input state.
+    """
+
+    log_agent_start("Transportation")
 
     destination = state["destination"]
 
     travelers = state["travelers"]
 
-    budget = state["budget"]["total_budget"]
+    budget = state.get("budget", {}).get("total_budget", 0)
 
     travel_style = state.get(
         "travel_style",
@@ -42,10 +54,25 @@ Provide:
 Return a concise response.
 """
 
-    response = model.invoke(prompt)
+    try:
 
-    state["transportation"] = response.content
+        response = model.invoke(prompt)
 
-    state["next_agent"] = "packing"
+        log_agent_complete("Transportation")
 
-    return state
+        return {
+            "transportation": response.content,
+            "completed_agents": {"transportation": True},
+        }
+
+    except Exception as exc:
+
+        log_agent_error("Transportation", exc)
+
+        return {
+            "transportation": "No transportation recommendations available.",
+            "completed_agents": {"transportation": True},
+            "errors": [
+                f"Transportation agent failed: {exc}"
+            ],
+        }

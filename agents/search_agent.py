@@ -2,8 +2,21 @@ from tools.tavily_tool import search_travel_info
 from tools.search_helper import extract_places
 from agents.ranking_agent import ranking_agent
 
+from services.agent_utils import (
+    log_agent_complete,
+    log_agent_error,
+    log_agent_start,
+)
+
 
 def search_agent(state):
+    """
+    Search for tourist attractions in the destination.
+
+    Returns a partial state update only. Never mutates the input state.
+    """
+
+    log_agent_start("Search")
 
     destination = state["destination"]
 
@@ -12,18 +25,33 @@ def search_agent(state):
         f"things to do in {destination}, India"
     )
 
-    results = search_travel_info(query)
+    try:
 
-    places = extract_places(results)
+        results = search_travel_info(query)
 
-    ranked_places = ranking_agent(places)
+        places = extract_places(results)
 
-    state["search_results"] = results
+        ranked_places = ranking_agent(places)
 
-    state["places"] = places
+        log_agent_complete("Search")
 
-    state["attractions"] = ranked_places
+        return {
+            "search_results": results,
+            "places": places,
+            "attractions": ranked_places,
+            "completed_agents": {"search": True},
+        }
 
-    state["next_agent"] = "budget"
+    except Exception as exc:
 
-    return state
+        log_agent_error("Search", exc)
+
+        return {
+            "search_results": [],
+            "places": [],
+            "attractions": [],
+            "completed_agents": {"search": True},
+            "errors": [
+                f"Search agent failed: {exc}"
+            ],
+        }

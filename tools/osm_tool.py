@@ -1,37 +1,22 @@
-# import requests
-
-
-# def search_location(place: str):
-#     url = "https://nominatim.openstreetmap.org/search"
-
-#     params = {
-#         "q": place,
-#         "format": "json",
-#         "limit": 5,
-#     }
-
-#     headers = {
-#         "User-Agent": "TravelMind-AI/1.0"
-#     }
-
-#     response = requests.get(
-#         url,
-#         params=params,
-#         headers=headers,
-#         timeout=10,
-#     )
-
-#     response.raise_for_status()
-
-#     return response.json()
-
-
 import requests
 
+from services.agent_utils import retry
 
+
+@retry(max_retries=3, delay=1.0)
 def search_location(place: str):
+    """
+    Search for a place using OpenStreetMap Nominatim.
 
-    print("Searching:", place)
+    Args:
+        place: The place name to search for.
+
+    Returns:
+        A list of location results from Nominatim.
+
+    Raises:
+        requests.RequestException: On network or HTTP errors.
+    """
 
     url = "https://nominatim.openstreetmap.org/search"
 
@@ -45,8 +30,6 @@ def search_location(place: str):
         "User-Agent": "TravelMind-AI/1.0"
     }
 
-    print("Sending request...")
-
     response = requests.get(
         url,
         params=params,
@@ -54,10 +37,6 @@ def search_location(place: str):
         timeout=10,
     )
 
-    print("Response received:", response.status_code)
-
     response.raise_for_status()
-
-    print("Converting JSON...")
 
     return response.json()
