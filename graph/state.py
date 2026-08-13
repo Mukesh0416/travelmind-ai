@@ -1,7 +1,8 @@
-from typing import TypedDict, Optional
+from typing import Optional, TypedDict
 
 
 class TravelState(TypedDict, total=False):
+
     destination: str
     days: int
     travelers: int
@@ -11,6 +12,14 @@ class TravelState(TypedDict, total=False):
 
     location: dict
     weather: dict
+
     search_results: list
+    places: list
+    attractions: list
+
     budget: dict
-    itinerary: dict
+
+    hotels: str
+    restaurants: str
+
+    itinerary: str

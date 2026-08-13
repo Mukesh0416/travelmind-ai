@@ -7,7 +7,8 @@ def search_travel_info(query: str):
 
     response = client.search(
         query=query,
-        search_depth="basic",
+        search_depth="advanced",
+        topic="general",
         max_results=5,
     )
 
