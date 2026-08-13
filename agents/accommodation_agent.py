@@ -1,4 +1,8 @@
 from langchain_groq import ChatGroq
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import PromptTemplate
+
+from schemas.agent_outputs import Hotel
 
 from services.agent_utils import (
     log_agent_complete,
@@ -10,6 +14,33 @@ model = ChatGroq(
     model="llama-3.1-8b-instant",
     temperature=0.3,
 )
+
+parser = JsonOutputParser(pydantic_object=Hotel)
+
+prompt_template = PromptTemplate(
+    template="""
+Suggest 5 hotels in {destination}, India.
+
+Travelers: {travelers}
+
+Total budget: ₹{budget}
+
+Return a JSON array of exactly 5 hotel objects.
+Each object must have these fields:
+
+- name: hotel name
+- price_range: price range string
+- description: short description
+
+Return ONLY valid JSON. No markdown, no extra text.
+
+{format_instructions}
+""",
+    input_variables=["destination", "travelers", "budget"],
+    partial_variables={"format_instructions": parser.get_format_instructions()},
+)
+
+chain = prompt_template | model | parser
 
 
 def accommodation_agent(state):
@@ -27,30 +58,18 @@ def accommodation_agent(state):
 
     travelers = state["travelers"]
 
-    prompt = f"""
-Suggest 5 hotels in {destination}, India.
-
-Travelers: {travelers}
-
-Total budget: ₹{budget}
-
-Requirements:
-
-- Hotel name
-- Price range
-- Short description
-
-Return a concise list.
-"""
-
     try:
 
-        response = model.invoke(prompt)
+        hotels = chain.invoke({
+            "destination": destination,
+            "travelers": travelers,
+            "budget": budget,
+        })
 
         log_agent_complete("Accommodation")
 
         return {
-            "hotels": response.content,
+            "hotels": hotels,
             "completed_agents": {"accommodation": True},
         }
 
@@ -59,7 +78,7 @@ Return a concise list.
         log_agent_error("Accommodation", exc)
 
         return {
-            "hotels": "No hotel recommendations available.",
+            "hotels": [],
             "completed_agents": {"accommodation": True},
             "errors": [
                 f"Accommodation agent failed: {exc}"

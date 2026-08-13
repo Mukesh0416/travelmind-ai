@@ -1,4 +1,8 @@
 from langchain_groq import ChatGroq
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import PromptTemplate
+
+from schemas.agent_outputs import Restaurant
 
 from services.agent_utils import (
     log_agent_complete,
@@ -10,6 +14,33 @@ model = ChatGroq(
     model="llama-3.1-8b-instant",
     temperature=0.3,
 )
+
+parser = JsonOutputParser(pydantic_object=Restaurant)
+
+prompt_template = PromptTemplate(
+    template="""
+Suggest 5 restaurants in {destination}, India.
+
+Travel style: {travel_style}
+
+Total trip budget: ₹{budget}
+
+Return a JSON array of exactly 5 restaurant objects.
+Each object must have these fields:
+
+- name: restaurant name
+- cuisine: cuisine type
+- cost_for_two: approximate cost for two people
+
+Return ONLY valid JSON. No markdown, no extra text.
+
+{format_instructions}
+""",
+    input_variables=["destination", "travel_style", "budget"],
+    partial_variables={"format_instructions": parser.get_format_instructions()},
+)
+
+chain = prompt_template | model | parser
 
 
 def restaurant_agent(state):
@@ -30,30 +61,18 @@ def restaurant_agent(state):
         "balanced"
     )
 
-    prompt = f"""
-Suggest 5 restaurants in {destination}, India.
-
-Travel style: {travel_style}
-
-Total trip budget: ₹{budget}
-
-For each restaurant, provide:
-
-- Restaurant name
-- Cuisine
-- Approximate cost for two people
-
-Return a concise list.
-"""
-
     try:
 
-        response = model.invoke(prompt)
+        restaurants = chain.invoke({
+            "destination": destination,
+            "travel_style": travel_style,
+            "budget": budget,
+        })
 
         log_agent_complete("Restaurant")
 
         return {
-            "restaurants": response.content,
+            "restaurants": restaurants,
             "completed_agents": {"restaurant": True},
         }
 
@@ -62,7 +81,7 @@ Return a concise list.
         log_agent_error("Restaurant", exc)
 
         return {
-            "restaurants": "No restaurant recommendations available.",
+            "restaurants": [],
             "completed_agents": {"restaurant": True},
             "errors": [
                 f"Restaurant agent failed: {exc}"

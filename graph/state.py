@@ -39,12 +39,14 @@ def merge_errors(
 class TravelState(TypedDict, total=False):
 
     # User inputs
+    user_id: str
     destination: str
     days: int
     travelers: int
     budget_per_day: float
     interests: list[str]
     travel_style: str
+    preferences: dict
 
     # Agent outputs
     location: dict
@@ -53,11 +55,11 @@ class TravelState(TypedDict, total=False):
     places: list
     attractions: list
     budget: dict
-    hotels: str
-    restaurants: str
-    transportation: str
-    packing_list: str
-    itinerary: str
+    hotels: list
+    restaurants: list
+    transportation: dict
+    packing_list: list
+    itinerary: dict
 
     # Orchestration
     completed_agents: Annotated[dict, merge_completed_agents]

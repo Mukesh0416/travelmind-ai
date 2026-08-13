@@ -2,6 +2,7 @@ from langgraph.graph import StateGraph
 from langgraph.graph import START, END
 
 from graph.state import TravelState
+from services.memory import memory
 from typing import Optional, cast
 
 from agents.supervisor_agent import create_supervisor
@@ -84,6 +85,15 @@ def run_travel_graph(
             "travel_style": "balanced",
         }
 
+    # Load user preferences from memory.
+    user_id = state.get("user_id")
+
+    if user_id:
+
+        preferences = memory.get_preferences(user_id)
+
+        state.setdefault("preferences", preferences)
+
     # Ensure the completion tracker is always present.
     state.setdefault("completed_agents", {
         "location": False,
@@ -97,4 +107,14 @@ def run_travel_graph(
         "itinerary": False,
     })
 
-    return travel_graph.invoke(cast(TravelState, state))
+    result = travel_graph.invoke(cast(TravelState, state))
+
+    # Save the destination to the user's travel history.
+    if user_id:
+
+        memory.add_previous_destination(
+            user_id,
+            result.get("destination", ""),
+        )
+
+    return result
