@@ -31,6 +31,10 @@ Travel style: {travel_style}
 
 Interests: {interests}
 
+User preferences:
+
+{preferences}
+
 Weather:
 
 {weather}
@@ -85,6 +89,7 @@ Return ONLY valid JSON. No markdown, no extra text.
         "attractions",
         "hotels",
         "restaurants",
+        "preferences",
     ],
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
@@ -142,6 +147,11 @@ def itinerary_agent(state):
         []
     )
 
+    preferences = state.get(
+        "preferences",
+        {}
+    )
+
     try:
 
         itinerary = chain.invoke({
@@ -155,6 +165,7 @@ def itinerary_agent(state):
             "attractions": attractions,
             "hotels": hotels,
             "restaurants": restaurants,
+            "preferences": preferences,
         })
 
         log_agent_complete("Itinerary")

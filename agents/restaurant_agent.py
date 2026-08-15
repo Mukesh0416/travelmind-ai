@@ -25,6 +25,10 @@ Travel style: {travel_style}
 
 Total trip budget: ₹{budget}
 
+User restaurant preferences:
+
+{restaurant_preferences}
+
 Return a JSON array of exactly 5 restaurant objects.
 Each object must have these fields:
 
@@ -36,7 +40,12 @@ Return ONLY valid JSON. No markdown, no extra text.
 
 {format_instructions}
 """,
-    input_variables=["destination", "travel_style", "budget"],
+    input_variables=[
+        "destination",
+        "travel_style",
+        "budget",
+        "restaurant_preferences",
+    ],
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
 
@@ -63,10 +72,16 @@ def restaurant_agent(state):
 
     try:
 
+        restaurant_preferences = state.get(
+            "preferences",
+            {},
+        ).get("restaurant_preferences", {})
+
         restaurants = chain.invoke({
             "destination": destination,
             "travel_style": travel_style,
             "budget": budget,
+            "restaurant_preferences": restaurant_preferences,
         })
 
         log_agent_complete("Restaurant")

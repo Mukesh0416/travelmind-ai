@@ -25,6 +25,10 @@ Travelers: {travelers}
 
 Total budget: ₹{budget}
 
+User hotel preferences:
+
+{hotel_preferences}
+
 Return a JSON array of exactly 5 hotel objects.
 Each object must have these fields:
 
@@ -36,7 +40,7 @@ Return ONLY valid JSON. No markdown, no extra text.
 
 {format_instructions}
 """,
-    input_variables=["destination", "travelers", "budget"],
+    input_variables=["destination", "travelers", "budget", "hotel_preferences"],
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
 
@@ -60,10 +64,16 @@ def accommodation_agent(state):
 
     try:
 
+        hotel_preferences = state.get(
+            "preferences",
+            {},
+        ).get("hotel_preferences", {})
+
         hotels = chain.invoke({
             "destination": destination,
             "travelers": travelers,
             "budget": budget,
+            "hotel_preferences": hotel_preferences,
         })
 
         log_agent_complete("Accommodation")

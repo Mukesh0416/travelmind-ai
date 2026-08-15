@@ -1,9 +1,15 @@
 import sys
+from pathlib import Path
 
 # Ensure UTF-8 output on Windows consoles (handles ₹ and other Unicode).
 _reconfigure = getattr(sys.stdout, "reconfigure", None)
 if _reconfigure is not None:
     _reconfigure(encoding="utf-8")
+
+# Add the project root to sys.path so imports work when run directly.
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from graph.travel_graph import run_travel_graph
 

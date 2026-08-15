@@ -62,5 +62,6 @@ class TravelState(TypedDict, total=False):
     itinerary: dict
 
     # Orchestration
+    next_agent: str
     completed_agents: Annotated[dict, merge_completed_agents]
     errors: Annotated[list, merge_errors]

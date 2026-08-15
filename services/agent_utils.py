@@ -1,21 +1,31 @@
 import logging
 import time
+import os
 from functools import wraps
+from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Logging setup
 # ---------------------------------------------------------------------------
 
+log_dir = Path(__file__).resolve().parent.parent / "logs"
+log_dir.mkdir(exist_ok=True)
+
+log_file = log_dir / "travelmind.log"
+
 logger = logging.getLogger("TravelMind")
 
 if not logger.handlers:
     handler = logging.StreamHandler()
+    file_handler = logging.FileHandler(log_file, encoding="utf-8")
     formatter = logging.Formatter(
         "[%(asctime)s] %(levelname)s - %(message)s",
         datefmt="%H:%M:%S",
     )
     handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
     logger.addHandler(handler)
+    logger.addHandler(file_handler)
     logger.setLevel(logging.INFO)
 
 

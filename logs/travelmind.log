@@ -81,3 +81,32 @@
 [00:22:50] INFO - [Supervisor] Executing itinerary Agent
 [00:22:50] INFO - [Supervisor] Executing Itinerary Agent
 [00:23:01] INFO - [Itinerary Agent] Completed
+[00:25:23] INFO - [Service] Starting trip planning for Manali
+[00:25:23] INFO - [Service] Loaded preferences for user test_user
+[00:25:23] INFO - [Service] Invoking travel planning graph for Manali
+[00:25:23] INFO - [Supervisor] Executing in parallel: ['location', 'budget']
+[00:25:23] INFO - [Supervisor] Executing Budget Agent
+[00:25:23] INFO - [Budget Agent] Completed
+[00:25:23] INFO - [Supervisor] Executing Location Agent
+[00:25:25] INFO - [Location Agent] Completed
+[00:25:25] INFO - [Supervisor] Executing in parallel: ['weather', 'search']
+[00:25:25] INFO - [Supervisor] Executing Search Agent
+[00:25:25] INFO - [Supervisor] Executing Weather Agent
+[00:25:27] INFO - [Search Agent] Completed
+[00:25:27] INFO - [Weather Agent] Completed
+[00:25:27] INFO - [Supervisor] Executing in parallel: ['accommodation', 'restaurant', 'transportation']
+[00:25:27] INFO - [Supervisor] Executing Accommodation Agent
+[00:25:27] INFO - [Supervisor] Executing Restaurant Agent
+[00:25:27] INFO - [Supervisor] Executing Transportation Agent
+[00:25:28] INFO - [Restaurant Agent] Completed
+[00:25:28] INFO - [Accommodation Agent] Completed
+[00:25:28] INFO - [Transportation Agent] Completed
+[00:25:28] INFO - [Supervisor] Executing packing Agent
+[00:25:28] INFO - [Supervisor] Executing Packing Agent
+[00:25:29] INFO - [Packing Agent] Completed
+[00:25:29] INFO - [Supervisor] Executing itinerary Agent
+[00:25:29] INFO - [Supervisor] Executing Itinerary Agent
+[00:25:30] INFO - [Itinerary Agent] Completed
+[00:25:30] INFO - [Service] Graph completed in 6.55s
+[00:25:30] INFO - [Service] Saved destination to travel history for user test_user
+[00:25:30] INFO - [Service] Trip planning completed for Manali
