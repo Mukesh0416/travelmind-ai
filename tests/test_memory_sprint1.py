@@ -25,7 +25,8 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 # Point the memory store at a temporary database so we do not touch
 # the real travelmind_memory.db during tests.
-import services.memory as memory_module
+import importlib
+memory_module = importlib.import_module("memory.memory")
 
 _TMP_DIR = tempfile.mkdtemp(prefix="travelmind_sprint1_")
 memory_module.DB_PATH = Path(_TMP_DIR) / "test_memory.db"
@@ -33,7 +34,7 @@ memory_module.DB_PATH = Path(_TMP_DIR) / "test_memory.db"
 # Reset the thread-local connection so the new DB path is used.
 memory_module._thread_local.connection = None
 
-from services.memory import memory  # noqa: E402
+from memory.memory import memory  # noqa: E402
 
 REQUIRED_TABLES = {"users", "preferences", "travel_history"}
 

@@ -1,7 +1,7 @@
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
-
+from config import GROQ_API_KEY
 from schemas.agent_outputs import Itinerary
 
 from services.agent_utils import (
@@ -11,7 +11,8 @@ from services.agent_utils import (
 )
 
 model = ChatGroq(
-    model="llama-3.1-8b-instant",
+    api_key=GROQ_API_KEY,
+    model="groq/compound-mini",
     temperature=0.3,
 )
 

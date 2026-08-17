@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from graph.travel_graph import run_travel_graph
 from schemas.travel_request import TravelRequest
-from services.memory import memory
+from memory.memory import memory
 
 app = FastAPI(title="TravelMind AI")
 

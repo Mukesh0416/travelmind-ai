@@ -4,7 +4,7 @@ Provides a unified entry point for planning trips with consistent output structu
 """
 
 from graph.travel_graph import run_travel_graph
-from services.memory import memory
+from memory.memory import memory
 from services.agent_utils import logger
 from datetime import datetime
 import json

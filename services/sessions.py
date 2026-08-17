@@ -6,7 +6,7 @@ Handles user sessions, preferences, and travel history.
 import json
 import os
 from datetime import datetime
-from services.memory import memory
+from memory.memory import memory
 
 
 class SessionManager:

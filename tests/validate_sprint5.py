@@ -27,13 +27,14 @@ if str(_PROJECT_ROOT) not in sys.path:
 # ---------------------------------------------------------------------------
 # Patch memory to use a temp DB for testing
 # ---------------------------------------------------------------------------
-import services.memory as memory_module
+import importlib
+memory_module = importlib.import_module("memory.memory")
 
 _TMP_DIR = tempfile.mkdtemp(prefix="travelmind_sprint5_")
 memory_module.DB_PATH = Path(_TMP_DIR) / "sprint5_test.db"
 memory_module._thread_local.connection = None
 
-from services.memory import memory
+from memory.memory import memory
 
 # ---------------------------------------------------------------------------
 # Imports

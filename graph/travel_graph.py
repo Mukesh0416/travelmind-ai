@@ -2,7 +2,7 @@ from langgraph.graph import StateGraph
 from langgraph.graph import START, END
 
 from graph.state import TravelState
-from services.memory import memory
+from memory.memory import memory
 from typing import Optional, cast
 
 from agents.supervisor_agent import create_supervisor
